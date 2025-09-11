@@ -4,9 +4,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/category/category_event.dart';
 import '../bloc/category/category_state.dart';
-import 'widgets/interstitial_ad.dart';
-import 'widgets/messages_card.dart';
-import 'widgets/rewarded_ad.dart';
+import 'widgets/messageù_card.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String category;
@@ -79,7 +77,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     final categoryColor = _getCategoryColor(widget.category);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -94,7 +91,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 title: Text(
                   _getCategoryTitle(widget.category),
                   style: const TextStyle(
-                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     shadows: [

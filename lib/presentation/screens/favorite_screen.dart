@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/favorite/favorite_bloc.dart';
 import '../bloc/favorite/favorite_event.dart';
 import '../bloc/favorite/favorite_state.dart';
-import 'widgets/message_card.dart';
+import 'widgets/messageù_card.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -13,42 +13,35 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Messages Favoris'),
-        backgroundColor: Colors.deepPurple,
+        centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            onPressed: () {
-              _showClearFavoritesDialog(context);
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: const Icon(
+                Icons.delete_sweep,
+                size: 30,
+                color: Colors.deepOrange,
+              ),
+              onPressed: () => _showClearFavoritesDialog(context),
+            ),
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-          ),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: BlocBuilder<FavoriteBloc, FavoriteState>(
           builder: (context, state) {
             if (state is FavoriteLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is FavoriteLoaded) {
               final favorites = state.favorites;
-
               if (favorites.isEmpty) {
                 return const Center(
-                  child: Text(
-                    'Aucun favori',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                  child: Text('Aucun favori', style: TextStyle(fontSize: 18)),
                 );
               }
-
               return ListView.builder(
-                padding: const EdgeInsets.all(16),
                 itemCount: favorites.length,
                 itemBuilder: (context, index) {
                   final message = favorites[index];
@@ -59,7 +52,7 @@ class FavoritesScreen extends StatelessWidget {
               return Center(
                 child: Text(
                   'Erreur: ${state.message}',
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             }
@@ -94,7 +87,7 @@ class FavoritesScreen extends StatelessWidget {
             },
             child: const Text(
               'Supprimer',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
         ],

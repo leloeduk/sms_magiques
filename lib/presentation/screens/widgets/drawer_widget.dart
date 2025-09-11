@@ -23,112 +23,136 @@ class DrawerWidget extends StatelessWidget {
     }
   }
 
+  Future<void> launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'leloeduk2025@gmail.com',
+      queryParameters: {
+        'subject': 'Support SMS Magique',
+        'body': 'Bonjour, je souhaite vous contacter…',
+      },
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      // Pas de client email trouvé
+      debugPrint('Impossible d’ouvrir l’email');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Drawer(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.deepPurple.shade900, Colors.deepPurple.shade400],
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          // Header du Drawer
+          _buildDrawerHeader(theme),
+
+          // Items de navigation
+          _buildDrawerItem(
+            context,
+            Icons.home,
+            'Accueil',
+            onHomePressed,
+            theme,
           ),
-        ),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            // Header du Drawer
-            _buildDrawerHeader(),
+          _buildDrawerItem(context, Icons.favorite, 'Favoris', () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+            );
+          }, theme),
+          _buildDrawerItem(
+            context,
+            Icons.update,
+            'Mettre à jour',
+            onUpdatePressed,
+            theme,
+          ),
+          _buildDrawerItem(
+            context,
+            Icons.share,
+            'Partager l\'app',
+            onSharePressed,
+            theme,
+          ),
+          _buildDrawerItem(context, Icons.info, 'À propos', () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AboutScreen()),
+            );
+          }, theme),
 
-            // Items de navigation
-            _buildDrawerItem(context, Icons.home, 'Accueil', onHomePressed),
-            _buildDrawerItem(context, Icons.favorite, 'Favoris', () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const FavoritesScreen(),
-                ),
-              );
-            }),
-            _buildDrawerItem(
-              context,
-              Icons.update,
-              'Mettre à jour',
-              onUpdatePressed,
-            ),
-            _buildDrawerItem(
-              context,
-              Icons.share,
-              'Partager l\'app',
-              onSharePressed,
-            ),
-            _buildDrawerItem(context, Icons.info, 'À propos', () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutScreen()),
-              );
-            }),
+          Divider(color: theme.dividerColor),
 
-            const Divider(color: Colors.white54),
+          // Section supplémentaire
+          _buildDrawerItem(context, Icons.settings, 'Paramètres', () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          }, theme),
+          _buildDrawerItem(
+            context,
+            Icons.star,
+            'Noter l\'app',
+            () => _launchURL(
+              'https://play.google.com/store/apps/details?id=com.leloeduk.app',
+            ),
+            theme,
+          ),
+          _buildDrawerItem(
+            context,
+            Icons.help,
+            'Aide & Support',
+            () => launchEmail,
+            theme,
+          ),
 
-            // Section supplémentaire
-            _buildDrawerItem(context, Icons.settings, 'Paramètres', () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            }),
-            _buildDrawerItem(
-              context,
-              Icons.star,
-              'Noter l\'app',
-              () => _launchURL(
-                'https://play.google.com/store/apps/details?id=com.votre.app',
-              ),
-            ),
-            _buildDrawerItem(
-              context,
-              Icons.help,
-              'Aide & Support',
-              () => _launchURL('mailto:leloeduk2025@gmail.com'),
-            ),
-          ],
-        ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
 
-  Widget _buildDrawerHeader() {
+  Widget _buildDrawerHeader(ThemeData theme) {
     return DrawerHeader(
       decoration: BoxDecoration(
-        color: Colors.deepPurple.shade900,
+        color: theme.primaryColor,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
         ),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.message, size: 30, color: Colors.white),
-          SizedBox(height: 10),
+          Icon(Icons.message, size: 30, color: theme.colorScheme.onPrimary),
+          const SizedBox(height: 10),
           Text(
             'SMS Magiques',
             style: TextStyle(
-              color: Colors.white,
+              color: theme.colorScheme.onPrimary,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             'Messages pour toutes les occasions',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(
+              color: theme.colorScheme.onPrimary.withOpacity(0.7),
+              fontSize: 14,
+            ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -139,12 +163,16 @@ class DrawerWidget extends StatelessWidget {
     IconData icon,
     String title,
     VoidCallback onTap,
+    ThemeData theme,
   ) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      leading: Icon(icon, color: theme.iconTheme.color),
+      title: Text(
+        title,
+        style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+      ),
       onTap: onTap,
-      hoverColor: Colors.white.withOpacity(0.1),
+      hoverColor: theme.hoverColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     );
   }

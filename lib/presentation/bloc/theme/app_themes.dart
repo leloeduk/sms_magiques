@@ -2,44 +2,50 @@ import 'package:flutter/material.dart';
 
 class AppThemes {
   static final ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: Colors.blue,
+    colorScheme: ColorScheme.light(
+      primary: Colors.deepPurple.shade900,
+      secondary: Colors.amber,
+      surface: Colors.white,
+    ),
     scaffoldBackgroundColor: Colors.grey[100],
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blue,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.deepPurple.shade900,
       foregroundColor: Colors.white,
       elevation: 2,
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Colors.blue,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: Colors.deepPurple.shade900,
       foregroundColor: Colors.white,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.black87),
       bodyMedium: TextStyle(color: Colors.black54),
     ),
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.amber),
   );
 
   static final ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.dark,
-    primaryColor: Colors.deepPurple,
+    colorScheme: ColorScheme.dark(
+      primary: Colors.deepPurple.shade900,
+      secondary: Colors.tealAccent,
+      surface: Colors.grey[900]!,
+    ),
     scaffoldBackgroundColor: Colors.black,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.deepPurple,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.deepPurple.shade900,
       foregroundColor: Colors.white,
       elevation: 2,
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Colors.deepPurple,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: Colors.deepPurple.shade900,
       foregroundColor: Colors.white,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.white),
       bodyMedium: TextStyle(color: Colors.white70),
     ),
-    colorScheme: ColorScheme.fromSwatch(
-      brightness: Brightness.dark,
-    ).copyWith(secondary: Colors.tealAccent),
   );
 }

@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sms_magique/data/models/category_list.dart';
 import '../bloc/ads/ads_bloc.dart';
 import '../bloc/ads/ads_event.dart';
@@ -22,80 +27,71 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
 
-  final Map<String, IconData> _categoryIcons = const {
-    "drague": Icons.favorite,
-    "pardon": Icons.heart_broken,
-    "anniversaire": Icons.cake,
-    "condoleances": Icons.emoji_people,
-    "merci": Icons.thumb_up,
-    "felicitations": Icons.celebration,
-    "bonjour_bonne_nuit": Icons.wb_sunny,
-    "motivation": Icons.rocket_launch,
-    "fetes": Icons.party_mode,
-    "amitie": Icons.people,
-    "autres": Icons.chat,
-  };
-
-  final Map<String, Color> _categoryColors = {
-    "drague": Colors.pink.shade900,
-    "pardon": Colors.blue.shade900,
-    "anniversaire": Colors.orange.shade900,
-    "condoleances": Colors.grey.shade900,
-    "merci": Colors.green.shade900,
-    "felicitations": Colors.yellow.shade900,
-    "bonjour_bonne_nuit": Colors.lightBlue.shade900,
-    "motivation": Colors.deepPurple.shade900,
-    "fetes": Colors.red.shade900,
-    "amitie": Colors.teal.shade900,
-    "autres": Colors.brown.shade900,
-  };
-
-  String _getCategoryTitle(String category) {
-    final Map<String, String> titles = {
-      "drague": "Drague",
-      "pardon": "Pardon",
-      "anniversaire": "Anniversaire",
-      "condoleances": "Condoléances",
-      "merci": "Merci",
-      "felicitations": "Félicitations",
-      "bonjour_bonne_nuit": "Salutations",
-      "motivation": "Motivation",
-      "fetes": "Fêtes",
-      "amitie": "Amitié",
-      "autres": "Autres",
-    };
-    return titles[category] ?? category;
+  Future<void> checkForUpdate(BuildContext context) async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        // Affiche le dialog pour mettre à jour
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Nouvelle mise à jour disponible'),
+            content: const Text(
+              'Une nouvelle version est disponible sur le Play Store. Voulez-vous mettre à jour ?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Plus tard'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  // Lance la mise à jour flexible
+                  await InAppUpdate.performImmediateUpdate();
+                },
+                child: const Text('Mettre à jour'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Application à jour !')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la vérification : $e')),
+      );
+    }
   }
 
-  void _showUpdateDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Mettre à jour'),
-        content: const Text('Vérification des mises à jour...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Application à jour !')),
-              );
-            },
-            child: const Text('Vérifier'),
-          ),
-        ],
-      ),
-    );
-  }
+  Future<void> shareApk(BuildContext context) async {
+    try {
+      // Récupérer le dossier temporaire
+      final tempDir = await getTemporaryDirectory();
+      final apkFile = File('${tempDir.path}/sms_magique.apk');
 
-  void _shareApp(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Fonctionnalité de partage')));
+      // Vérifie si le fichier existe
+      if (!await apkFile.exists()) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('APK non trouvé.')));
+        return;
+      }
+
+      // Partager le fichier
+      await Share.shareXFiles(
+        [XFile(apkFile.path)],
+        text: 'Découvrez l\'application SMS Magique !',
+        subject: 'SMS Magique',
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur partage APK : $e')));
+    }
   }
 
   // Pages du BottomNavigationBar
@@ -123,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.grey.shade300,
         drawer: DrawerWidget(
           onHomePressed: () {
             Navigator.pop(context);
@@ -134,11 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           onUpdatePressed: () {
             Navigator.pop(context);
-            _showUpdateDialog(context);
+            checkForUpdate(context);
           },
           onSharePressed: () {
             Navigator.pop(context);
-            _shareApp(context);
+            shareApk(context);
           },
         ),
         appBar: _currentIndex == 0
@@ -206,9 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
           selectedItemColor: Colors.deepPurple.shade900,
-          unselectedItemColor: Colors.grey[600],
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           showUnselectedLabels: true,
           elevation: 10,

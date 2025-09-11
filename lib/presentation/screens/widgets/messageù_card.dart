@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,8 +57,7 @@ class _MessageCardState extends State<MessageCard> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          color: Colors.grey.shade800,
-          elevation: 3,
+          elevation: 2,
           child: InkWell(
             onTap: () async {
               context.read<AdBloc>().add(
@@ -105,9 +102,9 @@ class _MessageCardState extends State<MessageCard> {
                         child: Text(
                           _getCategoryName(widget.message.category),
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -116,8 +113,13 @@ class _MessageCardState extends State<MessageCard> {
                   // Contenu du message
                   Text(
                     widget.message.text,
-                    style: const TextStyle(fontSize: 16, height: 1.4),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500,
+                    ),
                     maxLines: 3,
+
                     overflow: TextOverflow.ellipsis,
                   ),
 
