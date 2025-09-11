@@ -60,14 +60,28 @@ class AboutScreen extends StatelessWidget {
                     onPressed: () => _launchURL('https://github.com/leloeduk'),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.email, size: 50),
+                    icon: const Icon(Icons.email, size: 40),
                     onPressed: () =>
                         _launchURL('mailto:leloeduk2025@gmail.com'),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.public, size: 50),
+                    icon: const Icon(Icons.public, size: 40),
                     onPressed: () =>
                         _launchURL('https://www.youtube.com/@LeloEduk'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.call, size: 50),
+                    onPressed: () async {
+                      final Uri launchUri = Uri(
+                        scheme: 'tel',
+                        path: "+242066826352",
+                      );
+                      if (await canLaunchUrl(launchUri)) {
+                        await launchUrl(launchUri);
+                      } else {
+                        throw 'Could not launch $launchUri';
+                      }
+                    },
                   ),
                 ],
               ),

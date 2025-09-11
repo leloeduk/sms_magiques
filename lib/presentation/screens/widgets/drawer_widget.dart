@@ -148,6 +148,7 @@ class DrawerWidget extends StatelessWidget {
           Text(
             'Messages pour toutes les occasions',
             style: TextStyle(
+              // ignore: deprecated_member_use
               color: theme.colorScheme.onPrimary.withOpacity(0.7),
               fontSize: 14,
             ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:telephony/telephony.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../data/models/message_model.dart';
 import '../bloc/favorite/favorite_bloc.dart';
@@ -85,7 +84,9 @@ class MessageDetailScreen extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
+                      // ignore: deprecated_member_use
                       categoryColor.withOpacity(0.9),
+                      // ignore: deprecated_member_use
                       categoryColor.withOpacity(0.7),
                     ],
                   ),
@@ -146,6 +147,7 @@ class MessageDetailScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    // ignore: deprecated_member_use
                     shadowColor: categoryColor.withOpacity(0.3),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -170,9 +172,11 @@ class MessageDetailScreen extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
                       color: categoryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
+                        // ignore: deprecated_member_use
                         color: categoryColor.withOpacity(0.3),
                         width: 1,
                       ),
@@ -201,6 +205,7 @@ class MessageDetailScreen extends StatelessWidget {
                         color: Colors.blue,
                         onPressed: () {
                           FlutterClipboard.copy(message.text).then((value) {
+                            // ignore: use_build_context_synchronously
                             _showSnackBar(context, 'Message copié 📋');
                           });
                         },
@@ -308,12 +313,14 @@ class MessageDetailScreen extends StatelessWidget {
 
               if (await canLaunchUrl(smsUri)) {
                 await launchUrl(smsUri);
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Ouverture de l’application SMS 📱'),
                   ),
                 );
               } else {
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Impossible d’ouvrir l’application SMS ❌'),

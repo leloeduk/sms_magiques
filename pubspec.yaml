@@ -49,6 +49,7 @@ dependencies:
   clipboard: ^2.0.2
   google_mobile_ads: ^6.0.0
   in_app_update: ^4.2.4
+  upgrader: ^11.5.0
   
 
 dev_dependencies:

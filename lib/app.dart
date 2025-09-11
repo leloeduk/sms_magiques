@@ -30,8 +30,12 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AdBloc>(
-          create: (_) => AdBloc(dio: Dio())..add(InitializeAds()),
+          create: (_) => AdBloc()
+            ..add(InitializeAdMob()) // Initialiser AdMob
+            ..add(LoadBannerAd()) // Charger la bannière
+            ..add(LoadInterstitialAd()), // Charger l'interstitielle
         ),
+
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()..add(LoadTheme())),
         BlocProvider<FavoriteBloc>(
           create: (_) => FavoriteBloc()..add(LoadFavorites()),

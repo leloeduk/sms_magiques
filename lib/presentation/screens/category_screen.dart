@@ -4,7 +4,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/category/category_event.dart';
 import '../bloc/category/category_state.dart';
-import 'widgets/messageù_card.dart';
+import 'widgets/message_card.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String category;
@@ -108,7 +108,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
+                        // ignore: deprecated_member_use
                         categoryColor.withOpacity(0.8),
+                        // ignore: deprecated_member_use
                         categoryColor.withOpacity(0.6),
                       ],
                     ),

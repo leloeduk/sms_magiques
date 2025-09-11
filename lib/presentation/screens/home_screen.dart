@@ -6,9 +6,9 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sms_magique/data/models/category_list.dart';
+import 'package:sms_magique/presentation/screens/widgets/category_card.dart';
 import '../bloc/ads/ads_bloc.dart';
 import '../bloc/ads/ads_event.dart';
-import '../bloc/ads/ads_state.dart';
 import 'category_screen.dart';
 import 'favorite_screen.dart';
 import 'widgets/about_screen.dart';
@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
         // Affiche le dialog pour mettre à jour
         showDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Nouvelle mise à jour disponible'),
@@ -57,10 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       } else {
         ScaffoldMessenger.of(
+          // ignore: use_build_context_synchronously
           context,
         ).showSnackBar(const SnackBar(content: Text('Application à jour !')));
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur lors de la vérification : $e')),
       );
@@ -76,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Vérifie si le fichier existe
       if (!await apkFile.exists()) {
         ScaffoldMessenger.of(
+          // ignore: use_build_context_synchronously
           context,
         ).showSnackBar(const SnackBar(content: Text('APK non trouvé.')));
         return;
@@ -89,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(
+        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text('Erreur partage APK : $e')));
     }
@@ -106,69 +111,62 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Initialiser les ADS
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdBloc>().add(InitializeAds());
+      context.read<AdBloc>().add(InitializeAdMob());
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AdBloc, AdState>(
-      listener: (context, state) {
-        if (state is AdConsentState && state.consentRequested) {
-          _showConsentDialog(context);
-        }
-      },
-      child: Scaffold(
-        drawer: DrawerWidget(
-          onHomePressed: () {
-            Navigator.pop(context);
-            setState(() {
-              _currentIndex = 0;
-              _pageController.jumpToPage(0);
-            });
-          },
-          onUpdatePressed: () {
-            Navigator.pop(context);
-            checkForUpdate(context);
-          },
-          onSharePressed: () {
-            Navigator.pop(context);
-            shareApk(context);
-          },
-        ),
-        appBar: _currentIndex == 0
-            ? AppBar(
-                centerTitle: true,
-                title: const Text(
-                  'Catégories',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                backgroundColor: Colors.deepPurple.shade900,
-              )
-            : null,
-        body: Column(
-          children: [
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _pages,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-              ),
-            ),
-            // Bannière pub en bas
-            const AdBannerWidget(),
-          ],
-        ),
-        bottomNavigationBar: _buildBottomNavigationBar(),
+    return Scaffold(
+      drawer: DrawerWidget(
+        onHomePressed: () {
+          Navigator.pop(context);
+          setState(() {
+            _currentIndex = 0;
+            _pageController.jumpToPage(0);
+          });
+        },
+        onUpdatePressed: () {
+          Navigator.pop(context);
+          checkForUpdate(context);
+        },
+        onSharePressed: () {
+          Navigator.pop(context);
+          shareApk(context);
+        },
       ),
+      appBar: _currentIndex == 0
+          ? AppBar(
+              centerTitle: true,
+              title: const Text(
+                'Catégories',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              backgroundColor: Colors.deepPurple.shade900,
+            )
+          : null,
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: _pages,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
+          ),
+          // Bannière pub en bas
+          const AdBannerWidget(),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -181,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             spreadRadius: 2,
@@ -217,36 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  void _showConsentDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Personnalisation des publicités'),
-        content: const Text(
-          'Nous utilisons des publicités pour offrir cette application gratuitement. '
-          'Souhaitez-vous voir des publicités personnalisées pour une meilleure expérience ?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              context.read<AdBloc>().add(AdConsentDenied());
-              Navigator.pop(context);
-            },
-            child: const Text('Refuser'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<AdBloc>().add(AdConsentGranted());
-              Navigator.pop(context);
-            },
-            child: const Text('Accepter'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // Contenu de la page d'accueil séparé
@@ -280,7 +249,7 @@ class _HomeContent extends StatelessWidget {
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories[index];
-                    return _CategoryCard(
+                    return CategoryCard(
                       category: category,
                       icon:
                           _HomeContentState()._categoryIcons[category] ??
@@ -291,7 +260,6 @@ class _HomeContent extends StatelessWidget {
                       title: _HomeContentState()._getCategoryTitle(category),
                       onTap: () {
                         // Montrer une pub interstitielle avant la navigation
-                        context.read<AdBloc>().add(ShowInterstitialAd());
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -361,58 +329,3 @@ class _HomeContentState {
 }
 
 // Carte de catégorie
-class _CategoryCard extends StatelessWidget {
-  final String category;
-  final IconData icon;
-  final Color color;
-  final String title;
-  final VoidCallback onTap;
-
-  const _CategoryCard({
-    required this.category,
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color.withOpacity(0.8), color.withOpacity(0.6)],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 30, color: Colors.white),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

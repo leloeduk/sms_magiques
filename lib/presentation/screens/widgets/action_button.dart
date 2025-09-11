@@ -22,8 +22,10 @@ class ActionButton extends StatelessWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
+            // ignore: deprecated_member_use
             color: color.withOpacity(0.1),
             shape: BoxShape.circle,
+            // ignore: deprecated_member_use
             border: Border.all(color: color.withOpacity(0.3), width: 2),
           ),
           child: IconButton(

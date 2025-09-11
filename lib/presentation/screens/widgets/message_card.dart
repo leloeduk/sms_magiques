@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../data/models/message_model.dart';
 import '../../bloc/ads/ads_bloc.dart';
-import '../../bloc/ads/ads_event.dart';
 import '../../bloc/favorite/favorite_bloc.dart';
 import '../../bloc/favorite/favorite_event.dart';
 import '../../bloc/favorite/favorite_state.dart';
 import '../message_detail_screen.dart';
 import 'interstitial_ad.dart';
-import 'rewarded_ad.dart';
 
 class MessageCard extends StatefulWidget {
   final MessageModel message;
@@ -32,10 +29,8 @@ class MessageCard extends StatefulWidget {
 class _MessageCardState extends State<MessageCard> {
   @override
   void initState() {
-    InterstitialAdManager.loadInterstitial();
-    RewardedAdManager.loadRewarded();
-    context.read<AdBloc>().add(ShowInterstitialAd());
     super.initState();
+    InterstitialAdManager.showInterstitial(context, context.read<AdBloc>());
   }
 
   @override
@@ -60,23 +55,14 @@ class _MessageCardState extends State<MessageCard> {
           elevation: 2,
           child: InkWell(
             onTap: () async {
-              context.read<AdBloc>().add(
-                ShowRewardedAd(
-                  onReward: (RewardItem reward) {
-                    print(
-                      'Utilisateur a gagné ${reward.amount} ${reward.type}',
-                    );
-                  },
-                ),
+              InterstitialAdManager.showInterstitial(
+                context,
+                context.read<AdBloc>(),
               );
-              await Future.delayed(const Duration(seconds: 10), () {
-                // Petite pause pour laisser le temps à l'utilisateur de voir la pub
-              });
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      MessageDetailScreen(message: widget.message),
+                  builder: (_) => MessageDetailScreen(message: widget.message),
                 ),
               );
             },
@@ -172,25 +158,14 @@ class _MessageCardState extends State<MessageCard> {
                             icon: const Icon(Icons.visibility, size: 20),
                             color: Colors.deepPurple,
                             onPressed: () async {
-                              context.read<AdBloc>().add(
-                                ShowRewardedAd(
-                                  onReward: (RewardItem reward) {
-                                    print(
-                                      'Utilisateur a gagné ${reward.amount} ${reward.type}',
-                                    );
-                                  },
-                                ),
-                              );
-                              await Future.delayed(
-                                const Duration(seconds: 10),
-                                () {
-                                  // Petite pause pour laisser le temps à l'utilisateur de voir la pub
-                                },
+                              InterstitialAdManager.showInterstitial(
+                                context,
+                                context.read<AdBloc>(),
                               );
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MessageDetailScreen(
+                                  builder: (_) => MessageDetailScreen(
                                     message: widget.message,
                                   ),
                                 ),

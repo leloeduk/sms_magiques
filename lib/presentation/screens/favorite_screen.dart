@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/favorite/favorite_bloc.dart';
 import '../bloc/favorite/favorite_event.dart';
 import '../bloc/favorite/favorite_state.dart';
-import 'widgets/messageù_card.dart';
+import 'widgets/message_card.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});

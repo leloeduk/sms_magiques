@@ -13,6 +13,7 @@ class _BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
+      // ignore: deprecated_member_use
       ..color = Colors.deepPurple.withOpacity(0.1)
       ..style = PaintingStyle.fill;
 
