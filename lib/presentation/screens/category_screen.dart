@@ -4,6 +4,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/category/category_event.dart';
 import '../bloc/category/category_state.dart';
+import 'widgets/interstitial_ad.dart';
 import 'widgets/message_card.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   void initState() {
     super.initState();
+    InterstitialAdManager.loadInterstitial();
     _loadCategoryMessages();
   }
 

@@ -70,7 +70,7 @@ class AboutScreen extends StatelessWidget {
                         _launchURL('https://www.youtube.com/@LeloEduk'),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.call, size: 50),
+                    icon: const Icon(Icons.call, size: 40),
                     onPressed: () async {
                       final Uri launchUri = Uri(
                         scheme: 'tel',

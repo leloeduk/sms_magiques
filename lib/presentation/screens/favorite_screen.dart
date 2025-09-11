@@ -14,50 +14,111 @@ class FavoritesScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Messages Favoris'),
         centerTitle: true,
+        backgroundColor: Colors.deepPurple.shade900,
+        foregroundColor: Colors.white,
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: const Icon(
-                Icons.delete_sweep,
-                size: 30,
-                color: Colors.deepOrange,
-              ),
-              onPressed: () => _showClearFavoritesDialog(context),
-            ),
+          BlocBuilder<FavoriteBloc, FavoriteState>(
+            builder: (context, state) {
+              if (state is FavoriteLoaded && state.favorites.isNotEmpty) {
+                return IconButton(
+                  icon: const Icon(
+                    Icons.delete_sweep,
+                    size: 30,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => _showClearFavoritesDialog(context),
+                  tooltip: 'Supprimer tous les favoris',
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: BlocBuilder<FavoriteBloc, FavoriteState>(
-          builder: (context, state) {
-            if (state is FavoriteLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is FavoriteLoaded) {
-              final favorites = state.favorites;
-              if (favorites.isEmpty) {
+      body: Container(
+        decoration: BoxDecoration(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: BlocBuilder<FavoriteBloc, FavoriteState>(
+            builder: (context, state) {
+              if (state is FavoriteLoading) {
                 return const Center(
-                  child: Text('Aucun favori', style: TextStyle(fontSize: 18)),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.deepPurple,
+                    ),
+                  ),
+                );
+              } else if (state is FavoriteLoaded) {
+                final favorites = state.favorites;
+                if (favorites.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.favorite_border, size: 64),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Aucun message favori',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Ajoutez des messages en favoris pour les retrouver ici',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  itemCount: favorites.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final message = favorites[index];
+                    return MessageCard(message: message);
+                  },
+                );
+              } else if (state is FavoriteError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, size: 64),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Une erreur est survenue',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(),
+                        onPressed: () {
+                          context.read<FavoriteBloc>().add(LoadFavorites());
+                        },
+                        child: const Text('Réessayer'),
+                      ),
+                    ],
+                  ),
                 );
               }
-              return ListView.builder(
-                itemCount: favorites.length,
-                itemBuilder: (context, index) {
-                  final message = favorites[index];
-                  return MessageCard(message: message);
-                },
-              );
-            } else if (state is FavoriteError) {
-              return Center(
-                child: Text(
-                  'Erreur: ${state.message}',
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
+              return const Center(child: CircularProgressIndicator());
+            },
+          ),
         ),
       ),
     );
@@ -69,7 +130,7 @@ class FavoritesScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Supprimer tous les favoris'),
         content: const Text(
-          'Êtes-vous sûr de vouloir supprimer tous vos messages favoris ?',
+          'Êtes-vous sûr de vouloir supprimer tous vos messages favoris ? Cette action est irréversible.',
         ),
         actions: [
           TextButton(
@@ -77,17 +138,20 @@ class FavoritesScreen extends StatelessWidget {
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(),
             onPressed: () {
               context.read<FavoriteBloc>().add(ClearAllFavorites());
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Favoris supprimés')),
+                const SnackBar(
+                  content: Text('Tous les favoris ont été supprimés'),
+                  duration: Duration(seconds: 2),
+                ),
               );
             },
             child: const Text(
               'Supprimer',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
