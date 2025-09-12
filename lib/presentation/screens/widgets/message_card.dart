@@ -3,13 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../data/models/message_model.dart';
-import '../../bloc/ads/ads_bloc.dart';
-import '../../bloc/ads/ads_event.dart';
 import '../../bloc/favorite/favorite_bloc.dart';
 import '../../bloc/favorite/favorite_event.dart';
 import '../../bloc/favorite/favorite_state.dart';
 import '../message_detail_screen.dart';
-import 'interstitial_ad.dart';
 
 class MessageCard extends StatefulWidget {
   final MessageModel message;
@@ -29,11 +26,6 @@ class MessageCard extends StatefulWidget {
 
 class _MessageCardState extends State<MessageCard> {
   @override
-  void initState() {
-    super.initState();
-    InterstitialAdManager.showInterstitial();
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FavoriteBloc, FavoriteState>(
@@ -56,19 +48,13 @@ class _MessageCardState extends State<MessageCard> {
           elevation: 2,
           child: InkWell(
             onTap: () async {
-              InterstitialAdManager.showInterstitial();
-              // Attendre un peu avant de naviguer
-              await Future.delayed(const Duration(milliseconds: 1000));
-
-              if (context.mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MessageDetailScreen(message: widget.message),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MessageDetailScreen(message: widget.message),
+                ),
+              );
             },
             borderRadius: BorderRadius.circular(16),
             child: Padding(
@@ -161,23 +147,15 @@ class _MessageCardState extends State<MessageCard> {
                           IconButton(
                             icon: const Icon(Icons.visibility, size: 20),
                             color: Colors.deepPurple,
-                            onPressed: () async {
-                              InterstitialAdManager.showInterstitial();
-                              // Attendre un peu avant de naviguer
-                              await Future.delayed(
-                                const Duration(milliseconds: 100),
-                              );
-
-                              if (context.mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MessageDetailScreen(
-                                      message: widget.message,
-                                    ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MessageDetailScreen(
+                                    message: widget.message,
                                   ),
-                                );
-                              }
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -348,11 +326,6 @@ class CompactMessageCard extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.read<AdBloc>().add(LoadInterstitialAd());
-
-          final adBloc = context.read<AdBloc>();
-          adBloc.add(ShowInterstitialAd());
-
           Navigator.push(
             context,
             MaterialPageRoute(

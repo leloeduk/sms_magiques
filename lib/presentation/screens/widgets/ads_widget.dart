@@ -45,16 +45,11 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
           setState(() {
             _isAdLoaded = true;
           });
-          print('Banner ad loaded successfully.');
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('Banner ad failed to load: $error');
           ad.dispose();
           _isAdLoaded = false;
         },
-        onAdOpened: (Ad ad) => print('Banner ad opened.'),
-        onAdClosed: (Ad ad) => print('Banner ad closed.'),
-        onAdImpression: (Ad ad) => print('Banner ad impression.'),
       ),
       request: const AdRequest(),
     )..load();
@@ -62,7 +57,7 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
 
   String _getAdUnitId() {
     // Utilisez le Bloc pour obtenir l'ID approprié selon l'environnement
-    final bloc = context.read<AdBloc>();
+    context.read<AdBloc>();
     // Ici vous pouvez implémenter une logique pour choisir entre test et production
     return 'ca-app-pub-3940256099942544/6300978111'; // ID de test
   }

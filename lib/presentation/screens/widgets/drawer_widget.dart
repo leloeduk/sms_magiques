@@ -104,7 +104,7 @@ class DrawerWidget extends StatelessWidget {
             Icons.star,
             'Noter l\'app',
             () => _launchURL(
-              'https://play.google.com/store/apps/details?id=com.leloeduk.app',
+              'https://play.google.com/store/apps/details?id=com.leloeduk.sms_magique',
             ),
             theme,
           ),

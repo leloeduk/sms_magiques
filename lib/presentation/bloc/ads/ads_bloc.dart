@@ -103,10 +103,6 @@ class AdBloc extends Bloc<AdEvent, AdState> {
   ) async {
     if (!_isInitialized) return;
 
-    // Supprimer l’ancienne pub si elle existe
-    await _interstitialAd?.dispose();
-    _interstitialAd = null;
-
     await InterstitialAd.load(
       adUnitId: _interstitialAdId,
       request: const AdRequest(),
@@ -115,13 +111,11 @@ class AdBloc extends Bloc<AdEvent, AdState> {
           _interstitialAd = ad;
           _setupInterstitialListeners(ad);
           emit(InterstitialAdLoaded(interstitialAd: ad));
-          print("✅ Interstitial chargée");
         },
         onAdFailedToLoad: (error) {
           emit(InterstitialAdError(error: error.message));
-          print("❌ Échec interstitial: ${error.message}");
-          // 🔄 Retry après 15s (au lieu de 30 pour tester plus vite)
-          Future.delayed(const Duration(seconds: 15), () {
+          // 🔄 Retry après 30s
+          Future.delayed(const Duration(seconds: 30), () {
             add(LoadInterstitialAd());
           });
         },
@@ -131,18 +125,12 @@ class AdBloc extends Bloc<AdEvent, AdState> {
 
   void _setupInterstitialListeners(InterstitialAd ad) {
     ad.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (ad) {
-        print("📺 Interstitial affichée");
-      },
       onAdDismissedFullScreenContent: (ad) {
-        print("👋 Interstitial fermée");
         ad.dispose();
         _interstitialAd = null;
-        // Recharger automatiquement
         add(LoadInterstitialAd());
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
-        print("⚠️ Erreur affichage interstitial: $error");
         ad.dispose();
         _interstitialAd = null;
         add(LoadInterstitialAd());
@@ -153,10 +141,12 @@ class AdBloc extends Bloc<AdEvent, AdState> {
   void _onShowInterstitialAd(ShowInterstitialAd event, Emitter<AdState> emit) {
     if (_interstitialAd != null) {
       _interstitialAd!.show();
-      print("🚀 Interstitial show() appelé");
+      // Ne pas mettre _interstitialAd à null ici car le callback
+      // fullScreenContentCallback s'occupe de ça
     } else {
-      print("⏳ Interstitial pas prête → on recharge");
+      // Si aucune interstitielle n'est chargée, en charger une
       add(LoadInterstitialAd());
+      // Émettre un état pour informer qu'aucune pub n'était disponible
       emit(InterstitialAdNotAvailable());
     }
   }
