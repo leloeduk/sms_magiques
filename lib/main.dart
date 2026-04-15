@@ -7,6 +7,6 @@ import 'core/utils/hive_boxes.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  await HiveBoxes.initHive(); // initialise Hive
+  await HiveBoxes.initHive(); // initialise Hive ( box )
   runApp(MyApp());
 }
